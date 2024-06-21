@@ -12,65 +12,108 @@ export default function Home() {
   const [clickedCharacter, setClickedCharacter] = useState<ICharacters | null>(null);
   const [openModal, setOpenModal] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [nextPage, setNextPage] = useState<number>(29);
+  const [nextPage, setNextPage] = useState<number>(19);
 
   useEffect(() => {
     const getCharacters = async () => {
-        const characterList: ICharacters[] = await charactersApi();
-
-        const sortedCharacterList = characterList.sort((a,b) => {
-          if(a.name < b.name) return - 1;
-          if(a.name > b.name) return 1;
-          return 0;
-        })
-        
-        setCharacters(sortedCharacterList);
+      const characterList: ICharacters[] = await charactersApi();
+      setCharacters(characterList);
     }
 
     getCharacters();
-  }, [currentPage]); 
+  }, [currentPage]);
 
   const handleCharacterClick = (character: ICharacters) => {
     setClickedCharacter(character);
     setOpenModal(true);
   };
 
+  const handleSortAlphabetically = async () => {
+    const characterList: ICharacters[] = await charactersApi();
+
+    const sortedCharacterList = characterList.sort((a, b) => {
+      if (a.name < b.name) return - 1;
+      if (a.name > b.name) return 1;
+      return 0;
+    })
+
+    setCharacters(sortedCharacterList);
+  }
+
+  const handleDefaultSort = async () => {
+    const characterList: ICharacters[] = await charactersApi();
+    setCharacters(characterList);
+  }
+
+  const handleRandomSort = async () => {
+    const characterList: ICharacters[] = await charactersApi();
+
+    const randomCharacterList = characterList.sort(() => 0.5 - Math.random())
+    setCharacters(randomCharacterList);
+
+  }
+
   const handleNext = () => {
-    if(characters && currentPage < characters.length){
-      setCurrentPage(currentPage + 30)
-      setNextPage(nextPage + 30)
+    if (characters && currentPage < characters.length) {
+      setCurrentPage(currentPage + 20)
+      setNextPage(nextPage + 20)
     }
   };
 
   const handlePrevious = () => {
-    if(characters && currentPage > 0){
-      setCurrentPage(currentPage - 30)
-      setNextPage(nextPage - 30)
+    if (characters && currentPage > 0) {
+      setCurrentPage(currentPage - 20)
+      setNextPage(nextPage - 20)
     }
   };
+
+  const end = currentPage - nextPage;
 
 
   return (
     <div className="bg-harryBg min-h-screen bg-cover">
       <p className="text-center underline font-buttonFont font-bold text-6xl py-8"> HARRY POTTER CHARACTERS </p>
-      <div className="bg-whiteBg my-5 mx-8 rounded-lg">
-      <div className="grid grid-cols-6  items-center">
-        {characters.map((person: ICharacters, index: number) => {
-          if(currentPage <= index && index <= nextPage){
-            return (
-              <div key={index} className="p-6 flex justify-center">
-            <Button
-              className="bg-yellow-100  border-greenBg border-4 w-full h-16 focus:ring-0 font-bold text-black font-buttonFont p-2 enabled:hover:bg-greenBg enabled:hover:text-white text-nowrap"
-              onClick={() => handleCharacterClick(person)}
-            >
-              {person.name}
-            </Button>
-          </div>
-            )
-          }}
-          
-        )}
+
+
+      <div className="flex justify-center">
+        <div className=" pl-8">
+          <Button onClick={handleSortAlphabetically} className="px-10 bg-greenBg font-buttonFont font-bold">
+            Alphabetical
+          </Button>
+        </div>
+
+        <div className=" px-8">
+          <Button onClick={handleRandomSort} className="px-10 bg-greenBg font-buttonFont font-bold">
+            Random
+          </Button>
+        </div>
+
+        <div className="">
+          <Button onClick={handleDefaultSort} className="px-10 bg-greenBg font-buttonFont font-bold">
+            Default
+          </Button>
+        </div>
       </div>
+
+      <div className="bg-whiteBg my-8 mx-8 rounded-lg py-5">
+        <div className="grid grid-cols-5  items-center">
+          {characters.map((person: ICharacters, index: number) => {
+            if (currentPage <= index && index <= nextPage) {
+              return (
+                <div key={index} className="p-6 flex justify-center">
+                  <Button
+                    className="bg-yellow-100  border-greenBg border-4 w-full h-16 focus:ring-0 font-bold text-black font-buttonFont p-2 enabled:hover:bg-greenBg enabled:hover:text-white text-nowrap"
+                    onClick={() => handleCharacterClick(person)}
+                  >
+                    {person.name}
+                  </Button>
+                </div>
+              )
+            }
+          }
+
+          )}
+        </div>
       </div>
 
       {clickedCharacter && (
@@ -103,21 +146,24 @@ export default function Home() {
         </Modal>
       )}
 
-      <div className="flex justify-center mt-5">
+
+      <div className="flex justify-between mx-8">
         <Button
           className="mr-8 w-auto font-buttonFont enabled:hover:bg-hoverBtn font-bold bg-greenBg"
-          disabled={nextPage == 30}
+          disabled={currentPage == 0}
           onClick={handlePrevious}
         >
-          Previous
+          Prev
         </Button>
         <Button
           className="ml-8 w-auto font-bold font-buttonFont enabled:hover:bg-hoverBtn bg-greenBg"
           onClick={handleNext}
+          disabled={nextPage >= characters.length}
         >
           Next
         </Button>
       </div>
+
     </div>
   );
 }
