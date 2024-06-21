@@ -77,19 +77,19 @@ export default function Home() {
 
       <div className="flex justify-center">
         <div className=" pl-8">
-          <Button onClick={handleSortAlphabetically} className="px-10 bg-greenBg font-buttonFont font-bold">
+          <Button onClick={handleSortAlphabetically} className="px-10 bg-greenBg enabled:hover:bg-hoverBtn font-buttonFont font-bold">
             Alphabetical
           </Button>
         </div>
 
         <div className=" px-8">
-          <Button onClick={handleRandomSort} className="px-10 bg-greenBg font-buttonFont font-bold">
+          <Button onClick={handleRandomSort} className="px-10 bg-greenBg enabled:hover:bg-hoverBtn font-buttonFont font-bold">
             Random
           </Button>
         </div>
 
         <div className="">
-          <Button onClick={handleDefaultSort} className="px-10 bg-greenBg font-buttonFont font-bold">
+          <Button onClick={handleDefaultSort} className="px-10 bg-greenBg enabled:hover:bg-hoverBtn font-buttonFont font-bold">
             Default
           </Button>
         </div>
@@ -149,14 +149,14 @@ export default function Home() {
 
       <div className="flex justify-between mx-8">
         <Button
-          className="mr-8 w-auto font-buttonFont enabled:hover:bg-hoverBtn font-bold bg-greenBg"
+          className="mr-8 p-1 w-auto font-buttonFont enabled:hover:bg-hoverBtn font-bold bg-greenBg"
           disabled={currentPage == 0}
           onClick={handlePrevious}
         >
           Prev
         </Button>
         <Button
-          className="ml-8 w-auto font-bold font-buttonFont enabled:hover:bg-hoverBtn bg-greenBg"
+          className="ml-8 p-1 w-auto font-bold font-buttonFont enabled:hover:bg-hoverBtn bg-greenBg"
           onClick={handleNext}
           disabled={nextPage >= characters.length}
         >
