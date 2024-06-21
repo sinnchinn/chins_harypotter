@@ -3,6 +3,7 @@
 import { ICharacters } from "@/Interfaces/Interfaces";
 import { charactersApi } from "@/utils/DataServices";
 import { Button, Modal } from "flowbite-react";
+import next from "next";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -11,12 +12,19 @@ export default function Home() {
   const [clickedCharacter, setClickedCharacter] = useState<ICharacters | null>(null);
   const [openModal, setOpenModal] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [nextPage, setNextPage] = useState<number>(30);
+  const [nextPage, setNextPage] = useState<number>(29);
 
   useEffect(() => {
     const getCharacters = async () => {
         const characterList: ICharacters[] = await charactersApi();
-        setCharacters(characterList.slice(0, 30));
+
+        const sortedCharacterList = characterList.sort((a,b) => {
+          if(a.name < b.name) return - 1;
+          if(a.name > b.name) return 1;
+          return 0;
+        })
+        
+        setCharacters(sortedCharacterList);
     }
 
     getCharacters();
@@ -27,21 +35,42 @@ export default function Home() {
     setOpenModal(true);
   };
 
+  const handleNext = () => {
+    if(characters && currentPage < characters.length){
+      setCurrentPage(currentPage + 30)
+      setNextPage(nextPage + 30)
+    }
+  };
+
+  const handlePrevious = () => {
+    if(characters && currentPage > 0){
+      setCurrentPage(currentPage - 30)
+      setNextPage(nextPage - 30)
+    }
+  };
+
 
   return (
     <div className="bg-harryBg min-h-screen bg-cover">
-      <p className="text-center font-buttonFont font-bold text-6xl py-5"> HARRY POTTER CHARACTERS </p>
-      <div className="grid grid-cols-5 items-center">
-        {characters.slice(0, 30).map((person, index) => (
-          <div key={index} className="p-6 flex justify-center">
+      <p className="text-center underline font-buttonFont font-bold text-6xl py-8"> HARRY POTTER CHARACTERS </p>
+      <div className="bg-whiteBg my-5 mx-8 rounded-lg">
+      <div className="grid grid-cols-6  items-center">
+        {characters.map((person: ICharacters, index: number) => {
+          if(currentPage <= index && index <= nextPage){
+            return (
+              <div key={index} className="p-6 flex justify-center">
             <Button
-              className="bg-yellow-50 focus:ring-0 font-bold text-black font-buttonFont p-2 enabled:hover:bg-yellow-100"
+              className="bg-yellow-100  border-greenBg border-4 w-full h-16 focus:ring-0 font-bold text-black font-buttonFont p-2 enabled:hover:bg-greenBg enabled:hover:text-white text-nowrap"
               onClick={() => handleCharacterClick(person)}
             >
               {person.name}
             </Button>
           </div>
-        ))}
+            )
+          }}
+          
+        )}
+      </div>
       </div>
 
       {clickedCharacter && (
@@ -53,7 +82,7 @@ export default function Home() {
             <div className="p-2 flex justify-center overscroll-contain">
               <img className="rounded-lg h-96" src={clickedCharacter.image || 'noimg.jpg'} />
             </div>
-            <div className="p-2 h-96 overflow-y-scroll py-5">
+            <div className="p-2 h-96 overflow-y-scroll">
               <p>Alternate Name: {clickedCharacter.alternate_names[0] || 'N/A'}</p>
               <p>Date of Birth: {clickedCharacter.dateOfBirth || 'N/A'}</p>
               <p>Gender: {clickedCharacter.gender || 'N/A'}</p>
@@ -74,17 +103,17 @@ export default function Home() {
         </Modal>
       )}
 
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center mt-5">
         <Button
-          className="mr-2"
-          disabled={currentPage === 1}
+          className="mr-8 w-auto font-buttonFont enabled:hover:bg-hoverBtn font-bold bg-greenBg"
+          disabled={nextPage == 30}
+          onClick={handlePrevious}
         >
           Previous
         </Button>
-        <span className="self-center">Page {currentPage}</span>
         <Button
-          className="ml-2"
-          
+          className="ml-8 w-auto font-bold font-buttonFont enabled:hover:bg-hoverBtn bg-greenBg"
+          onClick={handleNext}
         >
           Next
         </Button>
